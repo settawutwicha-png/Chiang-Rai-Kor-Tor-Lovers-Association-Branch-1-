@@ -2,43 +2,28 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    public Transform attackPoint;    // จุดที่ใช้เช็คระยะโจมตี
-    public float attackRange = 0.8f; // รัศมีการโจมตี
-    public LayerMask enemyLayers;    // เลเยอร์ของศัตรู (เพื่อให้โจมตีโดนเฉพาะศัตรู)
-    public float attackDamage = 30f; // ดาเมจในการโจมตีแต่ละครั้ง
+    public float reflectDamage = 30f; // ดาเมจที่มอนจะโดนเมื่อมาชนตัวเรา
+    public float knockbackForce = 5f; // แรงผลักให้มอนกระเด็นถอยหลังเมื่อชน
 
-    void Update()
+    // ฟังก์ชันนี้จะทำงานอัตโนมัติเมื่อมี Collider ของมอนเข้ามาชนตัว Player
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        // เมื่อกดปุ่ม Spacebar จะสั่งโจมตี
-        if (Input.GetKeyDown(KeyCode.Space))
+        // 1. ตรวจสอบว่าสิ่งที่มาชนเรามี Tag ว่า "Enemy" หรือไม่
+        if (collision.gameObject.CompareTag("Enemy"))
         {
-            Attack();
-        }
-    }
+            // 2. ถ้าใช่ ให้ดึงสคริปต์ EnemyStats ของมอนตัวนั้นออกมา
+            EnemyStats enemyStats = collision.gameObject.GetComponent<EnemyStats>();
 
-    void Attack()
-    {
-        // สร้างวงกลมจำลองเพื่อเช็คว่ามีศัตรูอยู่ในรัศมีไหม
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
-
-        // วนลูปจัดการศัตรูที่โดนโจมตี
-        foreach (Collider2D enemy in hitEnemies)
-        {
-            EnemyStats enemyStats = enemy.GetComponent<EnemyStats>();
             if (enemyStats != null)
             {
-                // คำนวณทิศทางกระเด้ง
-                Vector2 hitDir = (enemy.transform.position - transform.position).normalized;
-                // ส่งดาเมจและแรงกระเด้งให้ศัตรู
-                enemyStats.TakeDamage(attackDamage, hitDir);
+                // 3. คำนวณทิศทางกระเด้งถอยหลัง (จากตัว Player ไปหาตัว Enemy)
+                Vector2 knockbackDir = (collision.transform.position - transform.position).normalized;
+
+                // 4. ส่งดาเมจและแรงกระเด็นไปให้มอน
+                enemyStats.TakeDamage(reflectDamage, knockbackDir);
+
+                Debug.Log("มอนสเตอร์มาชนโดนตัว! โดนดาเมจสะท้อนไป: " + reflectDamage);
             }
         }
-    }
-
-    // ฟังก์ชันช่วยแสดงวงกลมขอบเขตการตีในหน้า Editor (Scene View)
-    void OnDrawGizmosSelected()
-    {
-        if (attackPoint == null) return;
-        Gizmos.DrawWireSphere(attackPoint.position, attackRange);
     }
 }
