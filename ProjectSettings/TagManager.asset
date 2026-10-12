@@ -43,6 +43,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: ground
+    uniqueID: 1152379269
+    locked: 0
+  - name: object
+    uniqueID: 2165757643
+    locked: 0
+  - name: charector
+    uniqueID: 1728527573
+    locked: 0
+  - name: forceground
+    uniqueID: 3226612705
+    locked: 0
   m_RenderingLayers:
   - Default
   m_MigratedRenderPipelines: []
