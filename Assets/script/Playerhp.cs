@@ -1,38 +1,28 @@
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UI; // 1. เพิ่มบรรทัดนี้เพื่อให้เรียกใช้ UI Slider ได้
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHP : MonoBehaviour
 {
-    [Header("Health Settings")]
-    public float maxHealth = 100f;
-    public float currentHealth;
+    public int maxHealth = 100;
+    private int currentHealth;
 
     [Header("UI Reference")]
-    public Image hpBarFill; // ช่องสำหรับเชื่อมต่อกับภาพ Fill ใน UI
+    public Slider hpSlider; // 2. สร้างช่องสำหรับลาก Slider หลอดเลือดมาใส่
 
     void Start()
     {
-        // กำหนดให้เลือดเริ่มต้นเต็ม
         currentHealth = maxHealth;
-        UpdateHPUI();
+        UpdateHPUI(); // อัปเดตหน้าจอตั้งแต่เริ่มเกม
     }
 
-    void Update()
+    public void TakeDamage(int damage)
     {
-        // โค้ดสำหรับทดสอบ: กดปุ่ม Spacebar บนคีย์บอร์ดเพื่อลองลดเลือดทีละ 10
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            TakeDamage(10f);
-        }
-    }
+        currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth); // ป้องกันไม่ให้เลือดติดลบ
 
-    // ฟังก์ชันสำหรับรับความเสียหาย (โดนศัตรูโจมตี)
-    public void TakeDamage(float damageAmount)
-    {
-        currentHealth -= damageAmount;
-        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth); // ล็อคไม่ให้เลือดติดลบ
+        Debug.Log("Player took damage! Current HP: " + currentHealth);
 
-        UpdateHPUI();
+        UpdateHPUI(); // อัปเดตหลอดเลือดทุกครั้งที่เลือดลด
 
         if (currentHealth <= 0)
         {
@@ -40,18 +30,18 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    // ฟังก์ชันอัปเดตความยาวหลอดเลือดบน UI
     void UpdateHPUI()
     {
-        if (hpBarFill != null)
+        if (hpSlider != null)
         {
-            // สั่งปรับค่า Fill Amount (สัดส่วน 0.0 ถึง 1.0)
-            hpBarFill.fillAmount = currentHealth / maxHealth;
+            // คำนวณสัดส่วนค่าเลือดเป็น 0.0 ถึง 1.0 สำหรับ Slider
+            hpSlider.value = (float)currentHealth / maxHealth;
         }
     }
 
     void Die()
     {
-        Debug.Log("Player ตายแล้ว!");
+        Debug.Log("Player Died!");
+        // โค้ดสำหรับตอนผู้เล่นตาย (เช่น รีสตาร์ทฉาก)
     }
 }
